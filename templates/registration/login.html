@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход - YUZEDO{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h2>Вход в систему</h2>
+    
+    {% if form.errors %}
+    <div class="error" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        Неверное имя пользователя или пароль.
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label>Имя пользователя или Email:</label>
+            <input type="text" name="username" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label>Пароль:</label>
+            <input type="password" name="password" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <button type="submit" style="background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; width: 100%;">
+            Войти
+        </button>
+    </form>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <p>Нет аккаунта? <a href="/register/">Зарегистрироваться</a></p>
+        <p><a href="/">← Вернуться на главную</a></p>
+    </div>
+</div>
+{% endblock %}

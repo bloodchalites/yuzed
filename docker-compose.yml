@@ -1,0 +1,99 @@
+# backend/docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: yuzedo_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: yuzedo_main
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: yuzedo_redis
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass redis123
+
+  django:
+    build: .
+    container_name: yuzedo_django
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=yuzedo_postgres
+      - DB_PORT=5432
+      - DB_NAME=yuzedo_main
+      - DB_USER=admin
+      - DB_PASSWORD=admin123
+      - REDIS_URL=redis://:redis123@redis:6379/0
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  # МИКРОСЕРВИС ДОКУМЕНТОВ
+  documents_service:
+    build: ../microservices/document
+    container_name: yuzedo_documents
+    ports:
+      - "8005:8001"
+    volumes:
+      - ../microservices/document/media:/app/media
+      - ../microservices/document/django_app:/app/django_app
+      - ../microservices/document/config:/app/config
+      - ../microservices/document/manage.py:/app/manage.py
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=yuzedo_postgres
+      - DB_PORT=5432
+      - DB_NAME=documents_db
+      - DB_USER=admin
+      - DB_PASSWORD=admin123
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - SECRET_KEY=documents-service-secret-key-123
+      - DEBUG=True
+      - ALLOWED_HOSTS=localhost,127.0.0.1,documents_service
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8001"
+
+  # React для разработки
+  frontend-dev:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: yuzedo_frontend_dev
+    volumes:
+      - ../frontend/src:/app/src
+      - ../frontend/public:/app/public
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - REACT_APP_DOCUMENTS_API_URL=http://localhost:8005/api
+    stdin_open: true
+    tty: true
+    depends_on:
+      - django
+      - documents_service
+
+volumes:
+  postgres_data:

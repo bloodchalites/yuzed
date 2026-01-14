@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}YUZEDO{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+        .nav { margin: 20px 0; padding: 10px; background: #ecf0f1; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-left a { margin-right: 15px; color: #3498db; text-decoration: none; font-weight: bold; }
+        .nav-right a { margin-left: 15px; color: #e74c3c; text-decoration: none; font-weight: bold; }
+        .nav a:hover { text-decoration: underline; }
+        .content { padding: 20px; }
+        .message { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .user-info { background: #e8f4f8; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>YUZEDO 🚀</h1>
+            <p>Система электронного документооборота</p>
+        </div>
+        
+        <div class="nav">
+            <div class="nav-left">
+                <a href="/">🏠 Главная</a>
+                {% if user.is_authenticated %}
+                    <a href="/dashboard/">📊 Личный кабинет</a>
+                    <a href="/profile/">👤 Профиль</a>
+                    {% if user.is_staff %}
+                        <a href="/admin/">⚙️ Админка</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <div class="nav-right">
+                {% if user.is_authenticated %}
+                    <span style="color: #2c3e50; margin-right: 15px;">
+                        👋 Привет, <strong>{{ user.username }}</strong>
+                    </span>
+                    <a href="/logout/">🚪 Выйти</a>
+                {% else %}
+                    <a href="/login/">🔑 Войти</a>
+                    <a href="/register/" style="background: #2ecc71; color: white; padding: 5px 15px; border-radius: 4px;">📝 Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+        <div class="user-info">
+            <strong>👤 Пользователь:</strong> {{ user.username }}
+            {% if user.company_name %} | <strong>🏢 Компания:</strong> {{ user.company_name }} {% endif %}
+            | <strong>📧 Email:</strong> {{ user.email }}
+            | <strong>📞 Телефон:</strong> {{ user.phone }}
+            | <strong>🔢 ИНН:</strong> {{ user.inn }}
+            | <strong>📅 Зарегистрирован:</strong> {{ user.date_joined|date:"d.m.Y" }}
+        </div>
+        {% endif %}
+        
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>
