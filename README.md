@@ -25,7 +25,7 @@
 ```bash
 git clone https://github.com/ваш-логин/yuzedo-system.git
 cd yuzedo-system
-
+```
 **### 2. Зайди в папку с монолитом:**
 ```bash
 cd yuzedo
@@ -37,9 +37,13 @@ docker-compose up --build
 
 **### 4. Открыть в браузере:**
 Сайт: http://localhost:3000
+
 Админка: http://localhost:8000/admin
+
 Документы: http://localhost:8005
 
 Для входа в админку:
+
 Логин: admin
+
 Пароль: admin123
