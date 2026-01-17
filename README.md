@@ -23,8 +23,8 @@
 
 ### 1. Клонирование репозитория
 ```bash
-git clone https://github.com/ваш-логин/yuzedo-system.git
-cd yuzedo-system
+git clone https://github.com/bloodchalites/yuzed
+cd yuzed
 ```
 **### 2. Зайди в папку с монолитом:**
 ```bash
@@ -41,6 +41,8 @@ docker-compose up --build
 Админка: http://localhost:8000/admin
 
 Документы: http://localhost:8005
+
+Swagger http://localhost:8000/swagger/
 
 Для входа в админку:
 
